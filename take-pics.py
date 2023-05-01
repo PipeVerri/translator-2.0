@@ -1,8 +1,9 @@
+from tools import *
 import os
 import re
 import cv2
 
-currentPic = ""
+oldCurrentPic = ""
 count = {}
 
 for file in os.listdir("pictures"):
@@ -14,15 +15,26 @@ for file in os.listdir("pictures"):
     else:
         count[f_name] += 1
 
-cap = cv2.VideoCapture(0)
-
 while True:
     currentPic = input("Write the current pic you're taking(by default the last one):")
-    ret, frame = cap.read()
+    if currentPic == "":
+        currentPic = oldCurrentPic
+    else:
+        oldCurrentPic = currentPic
 
-    if not ret:
-        print("No camera was detected, try again")
+    img = next(inputs.read_image())
+    if img is None:
+        print("There was an error detecting the camera")
         continue
 
+    if inputs.get_landmarks(img) is None:
+        print("There was an error analyzing the image, check the lighting")
+        continue
+
+    if not (currentPic in count.keys()):
+        count[currentPic] = 1
+
     name = f"pictures/{currentPic}_{count[currentPic]}.png"
-    cv2.imwrite(name, frame)
+    cv2.imwrite(name, img)
+
+    count[currentPic] += 1
