@@ -1,4 +1,5 @@
-import inputs
+from tools import *
 
 while True:
-    print(next(inputs.get_landmarks()))
+    img = next(inputs.read_image())
+    print(inputs.get_landmarks(img))
